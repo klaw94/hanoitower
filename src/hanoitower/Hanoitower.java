@@ -4,8 +4,6 @@
  */
 
 package hanoitower;
-import java.util.ArrayList;
-
 
 /**
  *
@@ -16,54 +14,45 @@ public class Hanoitower {
     public static void main(String[] args) {
         Sticks [] stickArray = new Sticks[3];
         Disks [] diskArray = new Disks[3];
-        GameInfo gameInfo = new GameInfo();
 
 
         setBoard(stickArray, diskArray);
         printBoard(stickArray,diskArray);
 
-        doSpel(diskArray.length, stickArray, diskArray, gameInfo);
+        doSpel(diskArray.length, stickArray, diskArray);
     }
 
-    private static void doSpel(int nDisk, Sticks [] stickArray,  Disks [] diskArray, GameInfo gameInfo) {
-        hanoi(nDisk, 1, 3, stickArray, diskArray, gameInfo);
+    private static void doSpel(int nDisk, Sticks [] stickArray,  Disks [] diskArray) {
+        hanoi(nDisk, 1, 3, stickArray, diskArray);
     }
 
-    private static void hanoi(int nDisk, int fromPeg, int toPeg, Sticks[] stickArray, Disks[] diskArray, GameInfo gameInfo) {
+    private static void hanoi(int nDisk, int fromPeg, int toPeg, Sticks[] stickArray, Disks[] diskArray) {
         if(nDisk == 1){
-            moveTheDisk(nDisk -1, fromPeg, toPeg, stickArray, diskArray, gameInfo);
+            moveDisk(fromPeg -1, toPeg - 1, stickArray, diskArray);
+            printBoard(stickArray, diskArray);
+            System.out.println(" ");
         } else {
             int helpPeg = 6 - fromPeg - toPeg;
 
             //Step1
-            hanoi(nDisk - 1, fromPeg, helpPeg, stickArray, diskArray, gameInfo);
+            hanoi(nDisk - 1, fromPeg, helpPeg, stickArray, diskArray);
 
 
             //Step2
-            getMovingDisk(gameInfo, fromPeg - 1, stickArray, diskArray);
-            tryColumn(gameInfo, toPeg - 1, stickArray, diskArray);
+            moveDisk(fromPeg -1, toPeg - 1, stickArray, diskArray);
             printBoard(stickArray, diskArray);
             System.out.println(" ");
 
 
             //Step3
-            hanoi(nDisk - 1, helpPeg, toPeg, stickArray, diskArray, gameInfo);
+            hanoi(nDisk - 1, helpPeg, toPeg, stickArray, diskArray);
 
 
             return;
         }
 
     }
-
-    private static void moveTheDisk(int i, int fromPeg, int helpPeg, Sticks[] stickArray, Disks[] diskArray, GameInfo gameInfo) {
-        getMovingDisk(gameInfo, fromPeg-1, stickArray,diskArray);
-        tryColumn(gameInfo, helpPeg-1, stickArray, diskArray);
-        printBoard(stickArray,diskArray);
-        System.out.println(" ");
-    }
-
-
-    private static Sticks setSticks(Sticks stick, Disks[] diskArray) {
+        private static Sticks setSticks(Sticks stick, Disks[] diskArray) {
         stick = new Sticks(diskArray);
         return stick;
     }
@@ -92,23 +81,25 @@ public class Hanoitower {
         }
     }
 
-    private static void getMovingDisk(GameInfo gameInfo, int i, Sticks[] stickArray, Disks[] diskArray) {
+    private static Disks getMovingDisk(int fromPeg, Sticks[] stickArray, Disks[] diskArray) {
         for (int x = 0; x < diskArray.length; x++){
-            if (stickArray[i].disksHere.get(x).visualLength.contains("x")){
-                gameInfo.movingDisk = stickArray[i].disksHere.get(x);
-                Disks newDisk = new Disks(gameInfo.movingDisk.length, gameInfo.movingDisk.numberOfSpace);
+            if (stickArray[fromPeg].disksHere.get(x).visualLength.contains("x")){
+                Disks movingDisk = stickArray[fromPeg].disksHere.get(x);
+                Disks newDisk = new Disks(movingDisk.length, movingDisk.numberOfSpace);
                 newDisk.visualLength = newDisk.visualLength.replaceAll("x", ".");
-                stickArray[i].disksHere.set(x, newDisk);
-                break;
+                stickArray[fromPeg].disksHere.set(x, newDisk);
+                return movingDisk;
             }
 
         }
+        return null;
     }
 
-    private static void tryColumn(GameInfo gameInfo, int i, Sticks[] stickArray, Disks[] diskArray) {
+    private static void moveDisk(int fromPeg, int toPeg, Sticks[] stickArray, Disks[] diskArray) {
+        Disks movingDisk = getMovingDisk(fromPeg, stickArray, diskArray);
         for (int y = diskArray.length-1; y >= 0; y--){
-            if (!stickArray[i].disksHere.get(y).visualLength.contains("x")){
-                stickArray[i].disksHere.set(y, gameInfo.movingDisk);
+            if (!stickArray[toPeg].disksHere.get(y).visualLength.contains("x")){
+                stickArray[toPeg].disksHere.set(y, movingDisk);
                 break;
 
             }
